@@ -1,0 +1,41 @@
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || ''
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
+
+// Lazy client — only instantiated when Supabase is configured
+let _client: SupabaseClient | null = null
+function getClient(): SupabaseClient {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error('Supabase not configured — add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to .env')
+  }
+  if (!_client) _client = createClient(supabaseUrl, supabaseAnonKey)
+  return _client
+}
+
+// Exported for components that need it (auth state listener etc.)
+export const supabase = new Proxy({} as SupabaseClient, {
+  get(_, prop) {
+    return getClient()[prop as keyof SupabaseClient]
+  },
+})
+
+export async function signInWithGoogle() {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: `${window.location.origin}/planner`,
+    },
+  })
+  if (error) throw error
+}
+
+export async function signOut() {
+  const { error } = await supabase.auth.signOut()
+  if (error) throw error
+}
+
+export async function getSession() {
+  const { data } = await supabase.auth.getSession()
+  return data.session
+}
