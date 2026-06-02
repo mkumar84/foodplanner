@@ -20,11 +20,11 @@ export const supabase = new Proxy({} as SupabaseClient, {
   },
 })
 
-export async function signInWithGoogle() {
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
+export async function signInWithMagicLink(email: string) {
+  const { error } = await supabase.auth.signInWithOtp({
+    email,
     options: {
-      redirectTo: `${window.location.origin}/planner`,
+      emailRedirectTo: `${window.location.origin}/planner`,
     },
   })
   if (error) throw error
@@ -38,4 +38,33 @@ export async function signOut() {
 export async function getSession() {
   const { data } = await supabase.auth.getSession()
   return data.session
+}
+
+export async function loadProfile(userId: string) {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', userId)
+    .single()
+  if (error && error.code !== 'PGRST116') throw error // PGRST116 = row not found
+  return data as {
+    family: unknown
+    meal_plan: unknown
+    grocery_list: unknown
+    agent_notes: unknown
+    onboarding_complete: boolean
+  } | null
+}
+
+export async function saveProfile(userId: string, payload: {
+  family?: unknown
+  meal_plan?: unknown
+  grocery_list?: unknown
+  agent_notes?: unknown
+  onboarding_complete?: boolean
+}) {
+  const { error } = await supabase
+    .from('profiles')
+    .upsert({ id: userId, ...payload, updated_at: new Date().toISOString() })
+  if (error) throw error
 }

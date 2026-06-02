@@ -1,7 +1,7 @@
+import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
-import { ArrowRight, ShieldCheck, Flame, ShoppingCart, Clock, Star } from 'lucide-react'
-import { signInWithGoogle } from '@/lib/supabase'
+import { ArrowRight, ShieldCheck, Flame, ShoppingCart, Clock, Star, Mail } from 'lucide-react'
+import { signInWithMagicLink } from '@/lib/supabase'
 import { useAppStore } from '@/store'
 import { useNavigate } from 'react-router-dom'
 
@@ -21,13 +21,22 @@ const TESTIMONIALS = [
 export function Landing() {
   const navigate = useNavigate()
   const onboardingComplete = useAppStore((s) => s.onboardingComplete)
+  const [email, setEmail] = useState('')
+  const [sent, setSent] = useState(false)
+  const [sending, setSending] = useState(false)
 
-  async function handleGoogleLogin() {
+  async function handleMagicLink(e: React.FormEvent) {
+    e.preventDefault()
+    if (!email) return
+    setSending(true)
     try {
-      await signInWithGoogle()
+      await signInWithMagicLink(email)
+      setSent(true)
     } catch {
       // Supabase not configured — go straight to onboarding for demo
       navigate(onboardingComplete ? '/planner' : '/onboarding')
+    } finally {
+      setSending(false)
     }
   }
 
@@ -47,7 +56,7 @@ export function Landing() {
             Family Planner
           </span>
         </div>
-        <button onClick={handleGoogleLogin} className="btn-ghost text-sm">
+        <button onClick={() => document.getElementById('magic-link-form')?.scrollIntoView({ behavior: 'smooth' })} className="btn-ghost text-sm">
           Sign in
         </button>
       </header>
@@ -76,12 +85,50 @@ export function Landing() {
               Start planning free
               <ArrowRight className="w-5 h-5" />
             </button>
-            <button onClick={handleGoogleLogin} className="btn-secondary text-base px-8 py-4">
-              <span>🔐</span> Sign in with Google
+            <button
+              onClick={() => document.getElementById('magic-link-form')?.scrollIntoView({ behavior: 'smooth' })}
+              className="btn-secondary text-base px-8 py-4"
+            >
+              <Mail className="w-4 h-4" /> Sign in with email
             </button>
           </div>
 
           <p className="text-sm text-gray-400 mt-4">No credit card · Takes 2 minutes to set up</p>
+
+          {/* Magic link form */}
+          <motion.div
+            id="magic-link-form"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="mt-8 max-w-sm mx-auto"
+          >
+            {sent ? (
+              <div className="card p-5 text-center">
+                <div className="text-3xl mb-2">📬</div>
+                <p className="font-semibold text-gray-800 mb-1">Check your inbox</p>
+                <p className="text-sm text-gray-500">We sent a sign-in link to <strong>{email}</strong>. Click it to access your account.</p>
+              </div>
+            ) : (
+              <form onSubmit={handleMagicLink} className="card p-4 flex gap-2">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  required
+                  className="flex-1 px-3 py-2 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:border-green-400"
+                />
+                <button
+                  type="submit"
+                  disabled={sending}
+                  className="btn-primary text-sm px-4 py-2 shrink-0"
+                >
+                  {sending ? '…' : 'Send link'}
+                </button>
+              </form>
+            )}
+          </motion.div>
         </motion.div>
 
         {/* Hero illustration */}
@@ -188,7 +235,11 @@ export function Landing() {
             Ready to end the dinner dilemma?
           </h2>
           <p className="text-green-200 mb-8">Set up your family profile in 2 minutes. It's free.</p>
-          <button onClick={handleDemo} className="bg-white px-8 py-4 rounded-xl font-semibold text-base inline-flex items-center gap-2 hover:bg-green-50 transition-colors" style={{ color: 'var(--green)' }}>
+          <button
+            onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); setTimeout(() => document.getElementById('magic-link-form')?.scrollIntoView({ behavior: 'smooth' }), 300) }}
+            className="bg-white px-8 py-4 rounded-xl font-semibold text-base inline-flex items-center gap-2 hover:bg-green-50 transition-colors"
+            style={{ color: 'var(--green)' }}
+          >
             Start planning free <ArrowRight className="w-5 h-5" />
           </button>
         </motion.div>

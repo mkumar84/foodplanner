@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles, ChevronDown, X, ShieldCheck, RefreshCw } from 'lucide-react'
 import { useAppStore } from '@/store'
@@ -144,6 +145,25 @@ function MealDetail({ slot, onClose }: { slot: MealSlot; onClose: () => void }) 
             ))}
           </div>
         </div>
+
+        {meal.steps && meal.steps.length > 0 && (
+          <div className="mt-5">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3">How to make it</h3>
+            <ol className="space-y-2.5">
+              {meal.steps.map((step, i) => (
+                <li key={i} className="flex gap-3 text-sm">
+                  <span
+                    className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold text-white mt-0.5"
+                    style={{ background: 'var(--green)' }}
+                  >
+                    {i + 1}
+                  </span>
+                  <span className="text-gray-600 leading-relaxed">{step}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        )}
 
         <div className="mt-4 flex gap-2">
           <span className="chip chip-default text-xs">{meal.cuisine}</span>
@@ -334,8 +354,8 @@ export function Planner() {
             </div>
           ))}
           {MEAL_TYPES.map((mealType) => (
-            <>
-              <div key={mealType + '-label'} className="flex items-center">
+            <React.Fragment key={mealType}>
+              <div className="flex items-center">
                 <span className="text-xs font-medium text-gray-400 text-right w-full pr-1">
                   {MEAL_LABEL[mealType]}
                 </span>
@@ -363,7 +383,7 @@ export function Planner() {
                   </div>
                 )
               })}
-            </>
+            </React.Fragment>
           ))}
         </div>
       </div>

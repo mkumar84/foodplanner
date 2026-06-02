@@ -65,6 +65,12 @@ Return a JSON object with this exact structure:
         "agentNote": "Brief note explaining safety/nutrition decisions",
         "ingredients": [
           {{"name": "ingredient", "quantity": "2", "unit": "cups", "aisle": "pantry", "estimatedCost": 1.20}}
+        ],
+        "steps": [
+          "Brief step 1",
+          "Brief step 2",
+          "Brief step 3",
+          "Brief step 4"
         ]
       }}
     }}
@@ -80,6 +86,7 @@ Return a JSON object with this exact structure:
 
 Member IDs: {[m.id for m in family.members]}
 Aisle options: produce, dairy, meat, pantry, frozen, bakery, beverages, snacks, spices
+Include 4-6 brief cooking steps per meal (imperative sentences, under 15 words each).
 Return ONLY valid JSON. No markdown, no explanation outside the JSON."""
 
     message = client.messages.create(
@@ -122,7 +129,13 @@ Return a JSON object:
     "emoji": "🍽️",
     "safeFor": {[m.id for m in family.members]},
     "agentNote": "Why this meal works for the family",
-    "ingredients": []
+    "ingredients": [],
+    "steps": [
+      "Brief step 1",
+      "Brief step 2",
+      "Brief step 3",
+      "Brief step 4"
+    ]
   }},
   "note": {{
     "agent": "variety",

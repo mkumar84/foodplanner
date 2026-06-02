@@ -35,6 +35,7 @@ export interface Meal {
   safeFor: string[] // member ids
   agentNote?: string // AI reasoning
   emoji: string
+  steps?: string[]
 }
 
 export interface Ingredient {
