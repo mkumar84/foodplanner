@@ -32,6 +32,8 @@ function AuthHandler() {
               loadFromCloud(profile)
               navigate(profile.onboarding_complete ? '/planner' : '/onboarding', { replace: true })
             } else {
+              // First sign-in — no cloud profile yet. Clear demo/local data so user starts fresh.
+              loadFromCloud({ family: null, meal_plan: null, grocery_list: null, agent_notes: [], onboarding_complete: false })
               navigate('/onboarding', { replace: true })
             }
           } catch {
