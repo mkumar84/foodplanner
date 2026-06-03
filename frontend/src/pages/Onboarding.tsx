@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { Plus, Trash2, ChevronRight, ChevronLeft, Check, Loader2 } from 'lucide-react'
 import { useAppStore } from '@/store'
-import { SEED_FAMILY, SEED_MEAL_PLAN } from '@/lib/seedData'
+import { SEED_MEAL_PLAN } from '@/lib/seedData'
 import { generateMealPlan } from '@/lib/api'
 import { ALLERGY_OPTIONS, DIET_STYLES, AVATAR_OPTIONS, NUTRITION_GOALS, CUISINE_OPTIONS } from '@/lib/utils'
 import type { FamilyMember, FamilyProfile, DietStyle, NutritionGoal } from '@/types'
@@ -98,13 +98,8 @@ export function Onboarding() {
 
   const [step, setStep] = useState(0)
   const [generating, setGenerating] = useState(false)
-  const [familyName, setFamilyName] = useState('The Kumar Family')
-  const [members, setMembers] = useState<FamilyMember[]>([
-    { ...SEED_FAMILY.members[0] },
-    { ...SEED_FAMILY.members[1] },
-    { ...SEED_FAMILY.members[2] },
-    { ...SEED_FAMILY.members[3] },
-  ])
+  const [familyName, setFamilyName] = useState('')
+  const [members, setMembers] = useState<FamilyMember[]>([newMember()])
   const [activeMember, setActiveMember] = useState(0)
   const [budget, setBudget] = useState(150)
 
